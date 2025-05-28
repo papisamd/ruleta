@@ -2,15 +2,15 @@
 
 import { Card } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import type { Bet } from './RouletteGame'
+import type { Bet, BetType } from './RouletteGame'
 import { cn, formatCurrency } from "../lib/utils"
 
 interface BettingTableProps {
-  onPlaceBet: (bet: Omit<Bet, 'amount'>) => void
-  currentBets: Bet[]
-  selectedChip: number
-  canBet: boolean
-  winningNumber: number | null
+  onPlaceBet: (bet: Omit<Bet, 'amount'>) => void;
+  currentBets: Bet[];
+  selectedChip: number;
+  canBet: boolean;
+  winningNumber: number | null;
 }
 
 const getNumberColor = (num: number): string => {
@@ -34,13 +34,13 @@ export default function BettingTable({ onPlaceBet, currentBets, selectedChip, ca
   const placeStraightBet = (number: number) => {
     if (!canBet) return
     onPlaceBet({
-      type: 'straight',
+      type: 'straight' as BetType,
       numbers: [number],
       position: `straight-${number}`
     })
   }
 
-  const placeOutsideBet = (type: string, numbers: number[]) => {
+  const placeOutsideBet = (type: BetType, numbers: number[]) => {
     if (!canBet) return
     onPlaceBet({
       type,

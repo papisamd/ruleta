@@ -54,6 +54,10 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
 
   useEffect(() => {
     setIsClient(true)
+    // Inicializar con un valor aleatorio para que la primera animación sea diferente cada vez
+    const randomStart = Math.random() * 360;
+    setBallAngle(randomStart);
+    ballAngleRef.current = randomStart;
   }, [])
 
   const resetToIdle = useCallback(() => {
@@ -62,9 +66,8 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
     setBallRadius(240)
     setBallSpeed(0)
     setBounceCount(0)
-    setWheelRotation(0)
-    setBallAngle(0)
-    ballAngleRef.current = 0
+    setWheelRotation(prev => prev % 360) // Mantener la rotación actual pero normalizada
+    // No reiniciar el ángulo de la bola a 0
   }, [])
 
   const getNumberPosition = useCallback((index: number) => {
