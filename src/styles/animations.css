@@ -1,0 +1,102 @@
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(180deg) scale(1.01);
+  }
+  75% {
+    transform: rotate(720deg) scale(1.01);
+  }
+  100% {
+    transform: rotate(1080deg) scale(1);
+  }
+}
+
+@keyframes shadow-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(250, 204, 21, 0.2),
+                0 0 20px rgba(250, 204, 21, 0.4),
+                0 0 60px rgba(250, 204, 21, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.4),
+                0 0 40px rgba(250, 204, 21, 0.6),
+                0 0 80px rgba(250, 204, 21, 0.8);
+  }
+}
+
+@keyframes ball-bounce-settle {
+  0% {
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+  }
+  50% {
+    transform: scale(1.2) translateY(-5px);
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7));
+  }
+}
+
+@keyframes ball-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  }
+}
+
+@keyframes ball-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.8));
+  }
+}
+
+@keyframes bounce-effect {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.1);
+  }
+}
+
+.animate-rotate {
+  animation: rotate 20s linear infinite;
+}
+
+.shadow-glow {
+  animation: shadow-glow 2s ease-in-out infinite;
+}
+
+.ball-bounce-settle {
+  animation: ball-bounce-settle 1s ease-in-out;
+}
+
+.ball-spin {
+  animation: ball-spin 0.8s linear infinite;
+}
+
+.ball-glow {
+  animation: ball-glow 1.5s ease-in-out infinite;
+}
+
+.transition-gpu {
+  transition: transform 0.3s linear;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
