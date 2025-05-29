@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Card } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+import { Card } from './ui/card'
+import { cn } from '../lib/utils'
 
 interface RouletteWheelProps {
   isSpinning: boolean
@@ -27,12 +27,6 @@ const getColorName = (color: 'red' | 'black' | 'green'): string => {
 }
 
 export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, onSpinComplete }: RouletteWheelProps) {
-  // Validar que el número ganador esté en el rango válido
-  if (winningNumber !== null && !rouletteNumbers.includes(winningNumber)) {
-    console.warn(`Número ganador inválido: ${winningNumber}. Debe estar entre 0 y 36.`)
-    return null
-  }
-
   const [wheelRotation, setWheelRotation] = useState(0)
   const [ballAngle, setBallAngle] = useState(0)
   const [ballRadius, setBallRadius] = useState(240)
@@ -63,28 +57,18 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
   }, [])
 
   const settleOnWinningNumber = useCallback(() => {
-    if (winningNumber === null) {
-      console.warn('settleOnWinningNumber: No hay número ganador definido')
-      return
-    }
-
-    const numberIndex = rouletteNumbers.indexOf(winningNumber)
-    if (numberIndex === -1) {
-      console.error(`settleOnWinningNumber: Número ganador ${winningNumber} no encontrado en la ruleta`)
-      return
-    }
-
-    const { angle } = getNumberPosition(numberIndex)
-    setBallAngle(angle)
-    setBallRadius(175)
-    
-    // Aumentar el tiempo antes de llamar a onSpinComplete
-    setTimeout(() => {
-      if (onSpinComplete) {
-        console.log(`Giro completado. Número ganador: ${winningNumber}, Color: ${getColorName(getNumberColor(winningNumber))}`)
-        onSpinComplete()
+    if (winningNumber !== null) {
+      const numberIndex = rouletteNumbers.indexOf(winningNumber)
+      if (numberIndex !== -1) {
+        const { angle } = getNumberPosition(numberIndex)
+        setBallAngle(angle)
+        setBallRadius(175)
+        
+        setTimeout(() => {
+          if (onSpinComplete) onSpinComplete()
+        }, 500)
       }
-    }, 4000) // Aumentado a 4 segundos
+    }
   }, [winningNumber, onSpinComplete, getNumberPosition])
 
   // Lógica principal de animación
@@ -98,14 +82,7 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
     }
 
     if (!isSpinning && phase !== 'idle') {
-      // Mantener la fase 'settled' por más tiempo antes de resetear
-      if (phase === 'settled') {
-        const timer = setTimeout(() => {
-          setPhase('idle')
-          setBounceCount(0)
-        }, 4000) // 4 segundos de visualización
-        return () => clearTimeout(timer)
-      }
+      // Reset cuando se detiene el giro
       setPhase('idle')
       setBounceCount(0)
       return
@@ -211,31 +188,23 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
       {/* Panel del número ganador */}
       <div className="fixed top-4 right-4 z-50">
         {phase === 'settled' && typeof winningNumber === 'number' && (
-          <div className="flex flex-col items-center gap-4 bg-black/60 rounded-xl p-6 backdrop-blur-md 
-                          border-2 border-yellow-400/30 shadow-2xl animate-in fade-in slide-in-from-right duration-700
-                          min-w-[320px]">
-            <p className="text-3xl font-bold text-emerald-400 animate-pulse" 
-               style={{ animationDuration: '2s' }}>
-              Número Ganador
-            </p>              <div className={cn(
-                'w-48 h-48 rounded-full flex items-center justify-center text-9xl font-bold text-white shadow-2xl relative overflow-hidden',
-                'transform transition-all duration-1000',
-                'winner-container bg-gradient-to-br',
+          <div className="flex flex-col items-center gap-2 bg-black/40 rounded-lg p-3 backdrop-blur-md 
+                          border border-white/10 shadow-lg animate-in fade-in slide-in-from-right duration-300">
+            <p className="text-xl font-bold text-emerald-400">Número Ganador</p>
+            <div className={cn(
+                'w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-2xl relative overflow-hidden',
+                'animate-bounce bg-gradient-to-br',
                 {
-                  'from-red-500 via-red-600 to-red-700': getNumberColor(winningNumber) === 'red',
-                  'from-gray-700 via-gray-800 to-gray-900': getNumberColor(winningNumber) === 'black',
-                  'from-green-500 via-green-600 to-green-700': getNumberColor(winningNumber) === 'green'
+                  'from-red-500 via-red-600 to-red-700 ring-4 ring-red-300': getNumberColor(winningNumber) === 'red',
+                  'from-gray-700 via-gray-800 to-gray-900 ring-4 ring-gray-400': getNumberColor(winningNumber) === 'black',
+                  'from-green-500 via-green-600 to-green-700 ring-4 ring-green-300': getNumberColor(winningNumber) === 'green'
                 }
               )}>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                <span className="relative z-10 winner-number">{winningNumber}</span>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent animate-pulse"
-                     style={{ animationDuration: '2s' }} />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent animate-spin"
-                     style={{ animationDuration: '4s' }} />
+                <span className="relative z-10 drop-shadow-lg">{winningNumber}</span>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent animate-pulse" />
               </div>
-            <p className="mt-2 text-2xl font-bold transition-all duration-1000">
-              <span className={cn('transition-colors duration-1000', {
+            <p className="mt-2 text-lg font-semibold">
+              <span className={cn('', {
                 'text-red-400': getNumberColor(winningNumber) === 'red',
                 'text-gray-300': getNumberColor(winningNumber) === 'black',
                 'text-green-400': getNumberColor(winningNumber) === 'green'
@@ -297,8 +266,8 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
                     }}
                   >
                     <div 
-                      className={`w-full h-full rounded-full flex items-center justify-center text-white font-bold transition-all duration-500 ${
-                        isWinning ? 'text-2xl scale-150' : 'text-lg'
+                      className={`w-full h-full rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 ${
+                        isWinning ? 'text-xl scale-125' : 'text-lg'
                       } ${
                         color === 'red' 
                           ? 'bg-gradient-to-br from-red-600 to-red-800' 
@@ -307,23 +276,15 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
                             : 'bg-gradient-to-br from-green-600 to-green-800'
                       }`}
                       style={{
-                        transform: `rotate(90deg) scale(${isWinning ? 1.4 : 0.95})`,
+                        transform: `rotate(90deg) scale(${isWinning ? 1.2 : 0.95})`,
                         boxShadow: isWinning 
-                          ? '0 0 30px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.6)' 
+                          ? '0 0 20px rgba(255,215,0,0.8)' 
                           : '0 2px 8px rgba(0,0,0,0.3)'
                       }}
                     >
-                      <span className={cn(
-                        "transition-all duration-500",
-                        isWinning && "winning-glow"
-                      )}>
-                        {number}
-                      </span>
+                      {number}
                       {isWinning && (
-                        <>
-                          <div className="absolute inset-0 rounded-full bg-yellow-400/30 animate-ping" />
-                          <div className="absolute -inset-1 rounded-full border-2 border-yellow-400/40 animate-pulse" />
-                        </>
+                        <div className="absolute inset-0 rounded-full bg-yellow-400/20 animate-ping" />
                       )}
                     </div>
                   </div>
@@ -340,13 +301,15 @@ export default function ProfessionalCasinoRoulette({ isSpinning, winningNumber, 
 
             {/* Bola de la ruleta */}
             <div
-              className="absolute left-1/2 top-1/2 z-30 transition-all duration-100"
+              className={cn(
+                "absolute left-1/2 top-1/2 z-30",
+                phase === 'settled' ? 'transition-all duration-500 ease-out' : 'transition-all duration-100',
+                phase === 'settled' ? 'opacity-0' : ''
+              )}
               style={{
                 transform: `rotate(${ballAngle}deg) translate(-50%, calc(-50% - ${ballRadius}px))`,
-                opacity: isSpinning || phase === 'bouncing' || phase === 'settled' ? 1 : 0.7,
-                filter: phase === 'settled' 
-                  ? 'drop-shadow(0 0 15px #ffe066)' 
-                  : 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))'
+                opacity: isSpinning || phase === 'bouncing' ? 1 : 0.7,
+                filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))'
               }}
             >
               <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-gradient-to-br from-white via-gray-100 to-gray-400 shadow-xl relative overflow-hidden">
